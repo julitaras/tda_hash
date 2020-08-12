@@ -33,5 +33,9 @@ Ejecutamos:
 
 ##  FAQS <a name = "faqs"></a>
 
+- Que se esta entregando:
+
+Se entrega el desarrollo del tda y sus respectivas pruebas, evaluando todas las primitivas, puede observar --> [pruebas](hash_pruebas.c)
+
 - Una explicación de los diferentes tipos de hashes que conoce y cómo se resuelven las colisiones.
 - Qué entiende por rehash y por qué es importante.
