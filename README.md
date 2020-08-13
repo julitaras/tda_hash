@@ -2,7 +2,7 @@
 
 ---
 
-<p align="center"> Desarrollo de TDA hash
+<p align="center"> Desarrollo de TDA hash abierto
     <br> 
 </p>
 
@@ -22,20 +22,24 @@ Adicionalmente se pide la creación de un TDA iterador externo para el recorrido
 ## 🏁 Compilacion y Ejecucion <a name = "compilacion_ejecucion"></a>
 
 Compilamos:
+
 ````c
 gcc lista.c hash.c hash_pruebas.c -o hash -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0
 ````
 
 Ejecutamos:
+
 ````c
  ./hash
 ````
 
 ##  FAQS <a name = "faqs"></a>
 
-- Que se esta entregando:
+### ¿Qué se esta entregando?
 
 Se entrega el desarrollo del tda y sus respectivas pruebas, evaluando todas las primitivas, puede observar --> [pruebas](hash_pruebas.c)
 
-- Una explicación de los diferentes tipos de hashes que conoce y cómo se resuelven las colisiones.
-- Qué entiende por rehash y por qué es importante.
+### Una explicación de los diferentes tipos de hashes que conoce y cómo se resuelven las colisiones.
+
+ 
+### ¿Qué entiende por rehash y por qué es importante?
