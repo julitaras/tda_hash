@@ -43,3 +43,14 @@ Se entrega el desarrollo del tda y sus respectivas pruebas, evaluando todas las 
 
  
 ### ¿Qué entiende por rehash y por qué es importante?
+
+
+
+
+
+>Que es un hash?
+
+>Nos sirve para almacenar datos, estructura que nos sirve para almacenar datos y nos permite guardar el elemento en una posicion determinada.
+
+>Podemos acceder a la posicion que tenemos que almacenarlo casi directamente.
+
