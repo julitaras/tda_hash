@@ -41,6 +41,13 @@ Se entrega el desarrollo del tda y sus respectivas pruebas, evaluando todas las 
 
 ### Una explicación de los diferentes tipos de hashes que conoce y cómo se resuelven las colisiones.
 
+- HASH ABIERTO
+    - 
+- HASH CERRADO
+
+COMO SE RESUELVEN COLISIONES:
+
+
  
 ### ¿Qué entiende por rehash y por qué es importante?
 
