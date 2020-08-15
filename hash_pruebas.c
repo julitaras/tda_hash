@@ -46,9 +46,32 @@ void prueba_hash_cantidad(){
     prueba("El hash tiene 0 elementos", hash_cantidad(hash) == 0);
 }
 
+/*Prueba para funcion hash_contiene*/
+void prueba_hash_contiene(){
+    printf("\nINICIO DE PRUEBAS HASH CONTIENE\n");
+
+    /* Declaro las variables a utilizar*/
+    hash_t* hash = hash_crear(NULL, 5);
+
+    /*Inicio de pruebas*/
+    prueba("El hash se creo con exito", hash != NULL);
+}
+
+/*Prueba para funcion hash_obtener*/
+void prueba_hash_obtener(){
+    printf("\nINICIO DE PRUEBAS HASH OBTENER\n");
+
+    /* Declaro las variables a utilizar*/
+    hash_t* hash = hash_crear(NULL, 5);
+
+    /*Inicio de pruebas*/
+    prueba("El hash se creo con exito", hash != NULL);
+}
 
 int main(){
     prueba_hash_crear();
     prueba_hash_cantidad();
+    prueba_hash_contiene();
+    prueba_hash_obtener();
     return 0;
 }

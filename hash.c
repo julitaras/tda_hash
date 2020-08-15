@@ -18,7 +18,7 @@ typedef struct nodo_hash{
 
 
 /*Crea la estructura de nodo_hash_t, reservando memoria para la misma*/
-nodo_hash_t* nodo_crear(){
+nodo_hash_t* nodo_hash_crear(){
 
     nodo_hash_t* nodo = calloc(1, sizeof(nodo_hash_t));
     
@@ -43,7 +43,7 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad){
 		return NULL;
 	}
 
-    for (unsigned int i = 0; i < capacidad; i++){
+    for (size_t i = 0; i < capacidad; i++){
 		tabla[i] = lista_crear();
 	}
 
@@ -79,7 +79,7 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
     }
 
 
-    nodo_hash_t* nodo = nodo_crear();
+    nodo_hash_t* nodo = nodo_hash_crear();
 
     nodo->clave = clave;
     nodo->elemento = elemento;
@@ -118,6 +118,17 @@ bool hash_contiene(hash_t* hash, const char* clave){
     return true;
 }
 
+void* hash_obtener(hash_t* hash, const char* clave){
+    if(!hash){
+        return NULL;
+    }
+
+    size_t pos = hasheo(clave, hash->capacidad);
+
+    nodo_hash_t* elem = lista_elemento_en_posicion(hash->tabla, pos);
+
+    return elem;
+}
 
 size_t hash_cantidad(hash_t* hash){
     if(!hash){
