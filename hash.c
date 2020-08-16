@@ -55,7 +55,7 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad){
     return hash;
 }
 
-
+/*Funcion de hasheo*/
 size_t hasheo(char* clave, int tam){
     long suma = 0;
 
