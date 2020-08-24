@@ -71,11 +71,14 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
         return ERROR;
     }
 
+    if(hash->cantidad / hash->capacidad >= FACTOR_CARGA){
+        //AUMENTAR TAMAÑO Y POR LO TANTO REHASHEAR
+    }
+
     size_t pos = hasheo(clave, hash->capacidad);
 
     if(hash_contiene(hash, clave)){
-        //reemplazar el valor ?
-        //si reemplazamos encima perderiamos memoria es por eso que hay que usar una func de reeemplazo
+        return hash_reemplazar_valor(hash, clave, elemento);
     }
 
 
@@ -92,9 +95,6 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
 
     hash->cantidad++;
 
-    if(hash->cantidad / hash->capacidad >= FACTOR_CARGA){
-        //AUMENTAR TAMAÑO Y POR LO TANTO REHASHEAR
-    }
 
     // factor de carga: cantidad/capacidad
     // Si la cantidad /capacidad da mas del 75% agregar capacidad.
@@ -110,12 +110,23 @@ bool hash_contiene(hash_t* hash, const char* clave){
 
     size_t pos = hasheo(clave, hash->capacidad);
 
-    nodo_hash_t* elem = lista_elemento_en_posicion(hash->tabla, pos);
-    if(!elem){
-        return false;
+    lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
+    if(!iterador){
+       return NULL;
     }
 
-    return true;
+    while(lista_iterador_tiene_siguiente(iterador)){
+        nodo_hash_t* nodo = lista_iterador_siguiente(iterador);
+        if(strcmp(nodo->clave, clave) == 0){
+            lista_iterador_destruir(iterador);
+
+            return true;
+        }
+    }
+
+    lista_iterador_destruir(iterador);
+    
+    return false;
 }
 
 void* hash_obtener(hash_t* hash, const char* clave){
@@ -125,9 +136,25 @@ void* hash_obtener(hash_t* hash, const char* clave){
 
     size_t pos = hasheo(clave, hash->capacidad);
 
-    nodo_hash_t* elem = lista_elemento_en_posicion(hash->tabla, pos);
+   lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
+   
+   if(!iterador){
+       return NULL;
+    }
 
-    return elem;
+    while(lista_iterador_tiene_siguiente(iterador)){
+        nodo_hash_t* nodo = lista_iterador_siguiente(iterador);
+        
+        if(strcmp(nodo->clave, clave) == 0){
+            lista_iterador_destruir(iterador);
+            
+            return nodo;
+        }
+    }
+
+    lista_iterador_destruir(iterador);
+
+    return NULL;
 }
 
 size_t hash_cantidad(hash_t* hash){
@@ -146,4 +173,56 @@ void hash_destruir(hash_t* hash){
     //ver bien como destruir en la lista 
 
 	free(hash);
+}
+
+/*
+* SE encarga de reemplzar el valor en el nodo del hash
+*/
+int hash_reemplazar_valor(hash_t *hash, const char *clave, void *elemento) {
+    if(!hash){
+        return ERROR;
+    }
+
+    nodo_hash_t* nodo = hash_obtener(hash, clave);
+    if(!nodo){
+        return ERROR;
+    }
+
+    if(hash->destructor){
+        hash->destructor(nodo->elemento);
+    }
+
+    nodo->elemento = elemento;
+
+    return EXITO;
+}
+
+  //  FIJARSE BIEN TEMA DE LOS PRIMOS 
+
+bool hash_redimensionar(hash_t* hash) {
+	// ELEGIR NUEVO TAMAÑO
+	size_t nuevo_tamanio = 1;
+	lista_t** nueva_tabla = calloc(nuevo_tamanio, sizeof(lista_t*));
+	if (!nueva_tabla) return false;
+	
+	// Creo una nueva lista por cada posición de la nueva tabla
+	for (size_t i = 0; i < nuevo_tamanio; i++) {
+		nueva_tabla[i] = lista_crear();
+	}
+	// Saco los nodos del hash anterior, los vuelvo a hashear y los inserto
+	// en el nuevo hash
+	for (size_t i = 0; i < hash->capacidad; i++){
+		while (!lista_esta_vacia(hash->tabla[i])){
+			nodo_hash_t* nodo = lista_borrar_primero(hash->tabla[i]);
+			size_t pos_vect = fhash(nodo->clave, nuevo_tamanio);
+			lista_insertar_primero(nueva_tabla[pos_vect], nodo);
+		}
+		// Destruyo las listas del hash anterior
+		lista_destruir(hash->tabla[i]);
+	}
+	
+	free(hash->tabla);
+	hash->tabla = nueva_tabla;
+	hash->capacidad = nuevo_tamanio;
+	return true;
 }
