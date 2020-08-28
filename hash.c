@@ -16,6 +16,55 @@ typedef struct nodo_hash{
     char* clave;
 }nodo_hash_t;
 
+/*
+* Destructor de la tabla hash
+*/
+void destruir_tabla(lista_t** tabla_hash, size_t tamanio){
+	for(size_t i=0; i<tamanio; i++){
+		lista_destruir(tabla_hash[i]);
+    }
+
+	free(tabla_hash);	
+}
+
+/*
+* Funcion que dice si un numero es primo
+*/
+bool es_primo(size_t n) {
+    if (n <= 1){
+        return false;
+    }
+    
+    if (n <= 3){
+        return true;
+    }
+    
+    if (n % 2 == 0 || n % 3 == 0){
+        return false;
+    }
+
+    for (int i = 5; i * i <= n; i = i + 6){
+        if (n % i == 0 || n % (i + 2) == 0){
+           return false; 
+        }
+    }
+    return true;
+}
+
+/*
+* Funcion que recibe un numero por parametro 
+* e indica el proximo primo a ese numero
+*/
+size_t proximo_primo(size_t n) {
+    if ((n % 2) == 0){
+        n++;
+    }
+
+    while (!es_primo(n)){
+        n += 2;
+    }
+    return n;
+}
 
 /*Crea la estructura de nodo_hash_t, reservando memoria para la misma*/
 nodo_hash_t* nodo_hash_crear(){
@@ -37,7 +86,7 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad){
         capacidad = 3;
     }
 
-    lista_t** tabla = calloc(capacidad, sizeof(lista_t*));
+    lista_t** tabla = calloc(proximo_primo(capacidad), sizeof(lista_t*));
 	if (!tabla) {
 		free(hash);
 		return NULL;
@@ -45,6 +94,10 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad){
 
     for (size_t i = 0; i < capacidad; i++){
 		tabla[i] = lista_crear();
+
+        if(!tabla[i]){
+            destruir_tabla(tabla, capacidad);
+        }
 	}
 
     hash->tabla = tabla;
@@ -66,13 +119,63 @@ size_t hasheo(char* clave, int tam){
     return suma%tam;
 }
 
+/*
+* Funcion que se encarga de redimensionar el hash y por lo tanto, 
+* rehashear los elementos que estaban guardados en la tabla  
+* para asi poder guardarlos en la nueva tabla del hash
+*/
+int hash_redimensionar(hash_t* hash){
+
+    lista_iterador_t* iterador;
+	
+    size_t nuevo_tam = proximo_primo(2*hash->capacidad);
+	
+    lista_t** nueva_tabla = calloc(nuevo_tam, sizeof(lista_t*));
+	if (!nueva_tabla){
+        return ERROR;
+    }
+	
+	for (size_t i = 0; i < nuevo_tam; i++) {
+		nueva_tabla[i] = lista_crear();
+
+        if(!nueva_tabla[i]){
+            destruir_tabla(nueva_tabla, nuevo_tam);
+        }
+	}
+	
+	for(size_t i=0; i < hash->capacidad; i++){	
+        
+        iterador = lista_iterador_crear(hash->tabla[i]);
+        
+        while(lista_iterador_tiene_siguiente(iterador)){
+			nodo_hash_t* nodo = lista_iterador_siguiente(iterador);
+			size_t pos_nueva_tabla = hasheo(nodo->clave, nuevo_tam);
+			
+            if(lista_insertar(nueva_tabla[pos_nueva_tabla], nodo) == ERROR){
+                destruir_tabla(nueva_tabla, nuevo_tam);
+                lista_iterador_destruir(iterador);
+
+                return ERROR;
+			}
+		}
+		lista_iterador_destruir(iterador);
+	}
+	
+    destruir_tabla(hash->tabla, hash->capacidad);
+		
+	hash->capacidad = nuevo_tam;
+	hash->tabla = nueva_tabla;
+
+	return EXITO;
+}
+
 int hash_insertar(hash_t* hash, const char* clave, void* elemento){
     if(!hash || !clave){
         return ERROR;
     }
 
     if(hash->cantidad / hash->capacidad >= FACTOR_CARGA){
-        //AUMENTAR TAMAÑO Y POR LO TANTO REHASHEAR
+        return hash_redimensionar(hash);
     }
 
     size_t pos = hasheo(clave, hash->capacidad);
@@ -94,11 +197,6 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
     }
 
     hash->cantidad++;
-
-
-    // factor de carga: cantidad/capacidad
-    // Si la cantidad /capacidad da mas del 75% agregar capacidad.
-    // Hashear la clave para guardar el elemento
 
     return EXITO;
 }
@@ -176,7 +274,7 @@ void hash_destruir(hash_t* hash){
 }
 
 /*
-* SE encarga de reemplzar el valor en el nodo del hash
+* Se encarga de reemplzar el valor en el nodo del hash
 */
 int hash_reemplazar_valor(hash_t *hash, const char *clave, void *elemento) {
     if(!hash){
@@ -195,34 +293,4 @@ int hash_reemplazar_valor(hash_t *hash, const char *clave, void *elemento) {
     nodo->elemento = elemento;
 
     return EXITO;
-}
-
-  //  FIJARSE BIEN TEMA DE LOS PRIMOS 
-
-bool hash_redimensionar(hash_t* hash) {
-	// ELEGIR NUEVO TAMAÑO
-	size_t nuevo_tamanio = 1;
-	lista_t** nueva_tabla = calloc(nuevo_tamanio, sizeof(lista_t*));
-	if (!nueva_tabla) return false;
-	
-	// Creo una nueva lista por cada posición de la nueva tabla
-	for (size_t i = 0; i < nuevo_tamanio; i++) {
-		nueva_tabla[i] = lista_crear();
-	}
-	// Saco los nodos del hash anterior, los vuelvo a hashear y los inserto
-	// en el nuevo hash
-	for (size_t i = 0; i < hash->capacidad; i++){
-		while (!lista_esta_vacia(hash->tabla[i])){
-			nodo_hash_t* nodo = lista_borrar_primero(hash->tabla[i]);
-			size_t pos_vect = fhash(nodo->clave, nuevo_tamanio);
-			lista_insertar_primero(nueva_tabla[pos_vect], nodo);
-		}
-		// Destruyo las listas del hash anterior
-		lista_destruir(hash->tabla[i]);
-	}
-	
-	free(hash->tabla);
-	hash->tabla = nueva_tabla;
-	hash->capacidad = nuevo_tamanio;
-	return true;
 }
