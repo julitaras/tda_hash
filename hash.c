@@ -66,6 +66,21 @@ size_t proximo_primo(size_t n) {
     return n;
 }
 
+/*
+* Funcion que se encarga de agregar la clave al heap
+*/
+char* hash_duplicar_clave(const char *palabra) {
+    
+    char *copia = malloc(strlen (palabra) + 1);
+    if (!copia){
+        return NULL;
+    }
+    
+    strcpy(copia, palabra);
+    
+    return copia;
+}
+
 /*Crea la estructura de nodo_hash_t, reservando memoria para la misma*/
 nodo_hash_t* nodo_hash_crear(){
 
@@ -187,8 +202,8 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
 
     nodo_hash_t* nodo = nodo_hash_crear();
 
-    nodo->clave = clave;
     nodo->elemento = elemento;
+    nodo->clave = hash_duplicar_clave(clave);
 
     int exito = lista_insertar_en_posicion(*(hash->tabla), nodo, pos);
     if(exito == ERROR){
