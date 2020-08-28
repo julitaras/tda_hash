@@ -1,5 +1,7 @@
 #include "hash.h"
 #include "lista.h"
+#include <stdlib.h>
+#include <string.h>
 #define ERROR -1
 #define EXITO 0
 #define FACTOR_CARGA 0.7
@@ -7,8 +9,8 @@
 struct hash{
     lista_t** tabla;
     hash_destruir_dato_t destructor;
-    int capacidad;
-    int cantidad;
+    size_t capacidad;
+    size_t cantidad;
 };
 
 typedef struct nodo_hash{
@@ -124,7 +126,7 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad){
 }
 
 /*Funcion de hasheo*/
-size_t hasheo(char* clave, int tam){
+size_t hasheo(const char* clave, int tam){
     long suma = 0;
 
     for(size_t i=0;clave[i]; i++){
@@ -314,16 +316,17 @@ int hash_reemplazar_valor(hash_t *hash, const char *clave, void *elemento) {
 * posicion del elemento dentro de la lista
 */
 size_t hash_obtener_pos_lista(hash_t* hash, const char* clave){
-    if(!hash){
-        return NULL;
-    }
     size_t pos_lista = 0;
+    
+    if(!hash){
+        return pos_lista;
+    }
     size_t pos = hasheo(clave, hash->capacidad);
     
     lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
     
     if(!iterador){
-       return NULL;
+       return pos_lista;
     }
 
     while(lista_iterador_tiene_siguiente(iterador)){
