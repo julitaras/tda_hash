@@ -19,7 +19,7 @@ typedef struct nodo_hash{
 /*
 * Destructor de la tabla hash
 */
-void destruir_tabla(lista_t** tabla_hash, size_t tamanio){
+void hash_destruir_tabla(lista_t** tabla_hash, size_t tamanio){
 	for(size_t i=0; i<tamanio; i++){
 		lista_destruir(tabla_hash[i]);
     }
@@ -96,7 +96,7 @@ hash_t* hash_crear(hash_destruir_dato_t destruir_elemento, size_t capacidad){
 		tabla[i] = lista_crear();
 
         if(!tabla[i]){
-            destruir_tabla(tabla, capacidad);
+            hash_destruir_tabla(tabla, capacidad);
         }
 	}
 
@@ -139,7 +139,7 @@ int hash_redimensionar(hash_t* hash){
 		nueva_tabla[i] = lista_crear();
 
         if(!nueva_tabla[i]){
-            destruir_tabla(nueva_tabla, nuevo_tam);
+            hash_destruir_tabla(nueva_tabla, nuevo_tam);
         }
 	}
 	
@@ -152,7 +152,7 @@ int hash_redimensionar(hash_t* hash){
 			size_t pos_nueva_tabla = hasheo(nodo->clave, nuevo_tam);
 			
             if(lista_insertar(nueva_tabla[pos_nueva_tabla], nodo) == ERROR){
-                destruir_tabla(nueva_tabla, nuevo_tam);
+                hash_destruir_tabla(nueva_tabla, nuevo_tam);
                 lista_iterador_destruir(iterador);
 
                 return ERROR;
@@ -161,7 +161,7 @@ int hash_redimensionar(hash_t* hash){
 		lista_iterador_destruir(iterador);
 	}
 	
-    destruir_tabla(hash->tabla, hash->capacidad);
+    hash_destruir_tabla(hash->tabla, hash->capacidad);
 		
 	hash->capacidad = nuevo_tam;
 	hash->tabla = nueva_tabla;
@@ -231,12 +231,11 @@ void* hash_obtener(hash_t* hash, const char* clave){
     if(!hash){
         return NULL;
     }
-
     size_t pos = hasheo(clave, hash->capacidad);
-
-   lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
-   
-   if(!iterador){
+    
+    lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
+    
+    if(!iterador){
        return NULL;
     }
 
@@ -291,6 +290,65 @@ int hash_reemplazar_valor(hash_t *hash, const char *clave, void *elemento) {
     }
 
     nodo->elemento = elemento;
+
+    return EXITO;
+}
+
+/*
+* Funcion que se encarga de obtener la 
+* posicion del elemento dentro de la lista
+*/
+size_t hash_obtener_pos_lista(hash_t* hash, const char* clave){
+    if(!hash){
+        return NULL;
+    }
+    size_t pos_lista = 0;
+    size_t pos = hasheo(clave, hash->capacidad);
+    
+    lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
+    
+    if(!iterador){
+       return NULL;
+    }
+
+    while(lista_iterador_tiene_siguiente(iterador)){
+        nodo_hash_t* nodo = lista_iterador_siguiente(iterador);
+        
+        if(strcmp(nodo->clave, clave) == 0){
+            lista_iterador_destruir(iterador);
+            
+            return pos_lista;
+        }
+        pos_lista++;
+    }
+
+    lista_iterador_destruir(iterador);
+
+    return pos_lista;
+}
+
+int hash_quitar(hash_t* hash, const char* clave){
+    if(!hash){
+        return ERROR;
+    }
+
+    size_t pos = hasheo(clave, hash->capacidad);
+
+    nodo_hash_t* nodo_eliminar = hash_obtener(hash, clave);
+
+    if(hash->destructor){
+        hash->destructor(nodo_eliminar->elemento);
+    }
+
+    free(nodo_eliminar->clave);
+    free(nodo_eliminar);
+
+    int exito = lista_borrar_de_posicion(hash->tabla[pos], hash_obtener_pos_lista(hash, clave));
+    if(exito == ERROR){
+        return ERROR;
+    }
+
+    hash->cantidad--;
 
     return EXITO;
 }
