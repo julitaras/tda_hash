@@ -253,7 +253,6 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
     }
 
     size_t pos = hasheo(clave, hash->capacidad);
-    printf("POS %li\n", pos);
 
     if(hash_contiene(hash, clave)){
         return hash_reemplazar_valor(hash, clave, elemento);
@@ -372,19 +371,22 @@ int hash_quitar(hash_t* hash, const char* clave){
 
     size_t pos = hasheo(clave, hash->capacidad);
 
-    nodo_hash_t* nodo_eliminar = hash_obtener(hash, clave);
+    nodo_hash_t* nodo_eliminar = hash_obtener_nodo(hash, clave);
 
-    if(hash->destructor){
-        hash->destructor(nodo_eliminar->elemento);
+    if(!nodo_eliminar){
+        return ERROR;
     }
-
-    free(nodo_eliminar->clave);
-    free(nodo_eliminar);
 
     int exito = lista_borrar_de_posicion(hash->tabla[pos], hash_obtener_pos_lista(hash, clave));
     if(exito == ERROR){
         return ERROR;
     }
+
+    if(hash->destructor){
+        hash->destructor(nodo_eliminar->elemento);
+    }
+    free(nodo_eliminar->clave);
+    free(nodo_eliminar);
 
     hash->cantidad--;
 

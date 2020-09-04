@@ -70,6 +70,7 @@ void prueba_hash_contiene(){
     prueba("Obtengo el elemento insertado", hash_contiene(hash, "clave3"));
     prueba("Se inserta otro elemento que tiene la misma clave que el anterior al hash", hash_insertar(hash, "clave3", &d) == 0);
     prueba("Obtengo el elemento insertado", hash_contiene(hash, "clave3"));
+    prueba("Obtengo un elemento que no esta en el hash", !hash_contiene(hash, "clave4"));
 }
 
 
@@ -93,10 +94,31 @@ void prueba_hash_obtener(){
     prueba("Obtengo el elemento insertado", hash_obtener(hash, "clave3") == &d);
 }
 
+/*Prueba para funcion hash_quitar*/
+void prueba_hash_quitar(){
+    printf("\nINICIO DE PRUEBAS HASH QUITAR\n");
+
+    /* Declaro las variables a utilizar*/
+    hash_t* hash = hash_crear(NULL, 5);
+    int a = 1, b = 2, c = 3 , d = 4;
+
+    /*Inicio de pruebas*/
+    prueba("El hash se creo con exito", hash != NULL);
+    prueba("Se inserta un elemento al hash", hash_insertar(hash, "clave1", &a) == 0);
+    prueba("Se inserta otro elemento al hash", hash_insertar(hash, "clave2", &b) == 0);
+    prueba("Se inserta otro elemento al hash", hash_insertar(hash, "clave3", &c) == 0);
+    prueba("Se inserta otro elemento al hash", hash_insertar(hash, "clave4", &d) == 0);
+    prueba("Se quita un elemento al hash", hash_quitar(hash, "clave2") == 0);
+    prueba("Se quita un elemento al hash", hash_quitar(hash, "clave1") == 0);
+    prueba("Se quita un elemento al hash", hash_quitar(hash, "clave3") == 0);
+    prueba("Se quita un elemento al hash", hash_quitar(hash, "clave4") == 0);
+}
+
 int main(){
     prueba_hash_crear();
     prueba_hash_cantidad();
     prueba_hash_contiene();
     prueba_hash_obtener();
+    prueba_hash_quitar();
     return 0;
 }
