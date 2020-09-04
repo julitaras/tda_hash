@@ -191,6 +191,37 @@ int hash_redimensionar(hash_t* hash){
 }
 
 /*
+* Devuelve un nodo del hash con la clave dada o NULL si dicho
+* nodo no existe (o en caso de error).
+*/
+nodo_hash_t* hash_obtener_nodo(hash_t* hash, const char* clave){
+    if(!hash || !clave){
+        return NULL;
+    }
+    size_t pos = hasheo(clave, hash->capacidad);
+    
+    lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
+    
+    if(!iterador){
+       return NULL;
+    }
+
+    while(lista_iterador_tiene_siguiente(iterador)){
+        nodo_hash_t* nodo = lista_iterador_siguiente(iterador);
+
+        if(strcmp(nodo->clave, clave) == 0){
+            lista_iterador_destruir(iterador);
+
+            return nodo;
+        }
+    }
+
+    lista_iterador_destruir(iterador);
+
+    return NULL;
+}
+
+/*
 * Se encarga de reemplzar el valor en el nodo del hash
 */
 int hash_reemplazar_valor(hash_t *hash, const char *clave, void *elemento) {
@@ -198,7 +229,7 @@ int hash_reemplazar_valor(hash_t *hash, const char *clave, void *elemento) {
         return ERROR;
     }
 
-    nodo_hash_t* nodo = hash_obtener(hash, clave);
+    nodo_hash_t* nodo = hash_obtener_nodo(hash, clave);
     if(!nodo){
         return ERROR;
     }
@@ -273,27 +304,13 @@ void* hash_obtener(hash_t* hash, const char* clave){
     if(!hash || !clave){
         return NULL;
     }
-    size_t pos = hasheo(clave, hash->capacidad);
-    
-    lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
-    
-    if(!iterador){
-       return NULL;
+
+    nodo_hash_t* nodo = hash_obtener_nodo(hash, clave);
+    if(!nodo){
+        return NULL;
     }
 
-    while(lista_iterador_tiene_siguiente(iterador)){
-        nodo_hash_t* nodo = lista_iterador_siguiente(iterador);
-
-        if(strcmp(nodo->clave, clave) == 0){
-            lista_iterador_destruir(iterador);
-
-            return nodo->elemento;
-        }
-    }
-
-    lista_iterador_destruir(iterador);
-
-    return NULL;
+    return nodo->elemento;
 }
 
 size_t hash_cantidad(hash_t* hash){
