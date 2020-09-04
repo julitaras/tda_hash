@@ -44,12 +44,17 @@ void prueba_hash_cantidad(){
     /*Inicio de pruebas*/
     prueba("El hash se creo con exito", hash != NULL);
     prueba("El hash tiene 0 elementos", hash_cantidad(hash) == 0);
-    prueba("Se inserta un elemento al hash", hash_insertar(hash, "juli", &a) == 0);
+    prueba("Se inserta un elemento al hash", hash_insertar(hash, "clave1", &a) == 0);
     prueba("El hash tiene 1 elemento", hash_cantidad(hash) == 1);
-    prueba("Se inserta un elemento al hash con la misma clave que el anterior", hash_insertar(hash, "juli", &b) == 0);
+    prueba("Se inserta un elemento al hash con la misma clave que el anterior", hash_insertar(hash, "clave1", &b) == 0);
     prueba("El hash tiene 1 elemento", hash_cantidad(hash) == 1);
-    prueba("Se inserta un otro elemento al hash", hash_insertar(hash, "nati", &c) == 0);
+    prueba("Se inserta un otro elemento al hash", hash_insertar(hash, "clave2", &c) == 0);
     prueba("El hash tiene 2 elementos", hash_cantidad(hash) == 2);
+    prueba("Se quita un elemento al hash", hash_quitar(hash, "clave1") == 0);
+    prueba("El hash tiene 1 elemento", hash_cantidad(hash) == 1);
+    prueba("Se quita un elemento al hash", hash_quitar(hash, "clave2") == 0);
+    prueba("El hash tiene 0 elemento", hash_cantidad(hash) == 0);
+
 }
 
 /*Prueba para funcion hash_contiene*/
@@ -70,7 +75,9 @@ void prueba_hash_contiene(){
     prueba("Obtengo el elemento insertado", hash_contiene(hash, "clave3"));
     prueba("Se inserta otro elemento que tiene la misma clave que el anterior al hash", hash_insertar(hash, "clave3", &d) == 0);
     prueba("Obtengo el elemento insertado", hash_contiene(hash, "clave3"));
-    prueba("Obtengo un elemento que no esta en el hash", !hash_contiene(hash, "clave4"));
+    prueba("Intento obtener un elemento que no esta en el hash", !hash_contiene(hash, "clave4"));
+    prueba("Se quita un elemento al hash", hash_quitar(hash, "clave2") == 0);
+    prueba("Intento obtener un elemento que ya no esta mas en el hash", !hash_contiene(hash, "clave2"));
 }
 
 
