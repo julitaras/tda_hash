@@ -1,7 +1,6 @@
-#include "hash.c"
+#include "hash.h"
 #include <stdio.h>
 #include <stdbool.h>
-
 #define COLOR_ROJO	   "\x1b[1m\x1b[31m"
 #define COLOR_VERDE   "\x1b[1m\x1b[32m"
 #define COLOR_NORMAL   "\x1b[0m"
@@ -40,10 +39,17 @@ void prueba_hash_cantidad(){
 
     /* Declaro las variables a utilizar*/
     hash_t* hash = hash_crear(NULL, 5);
+    int a = 1, b = 2, c = 3;
 
     /*Inicio de pruebas*/
     prueba("El hash se creo con exito", hash != NULL);
     prueba("El hash tiene 0 elementos", hash_cantidad(hash) == 0);
+    prueba("Se inserta un elemento al hash", hash_insertar(hash, "juli", &a) == 0);
+    prueba("El hash tiene 1 elemento", hash_cantidad(hash) == 1);
+    prueba("Se inserta un elemento al hash con la misma clave que el anterior", hash_insertar(hash, "juli", &b) == 0);
+    prueba("El hash tiene 1 elemento", hash_cantidad(hash) == 1);
+    prueba("Se inserta un otro elemento al hash", hash_insertar(hash, "nati", &c) == 0);
+    prueba("El hash tiene 2 elementos", hash_cantidad(hash) == 2);
 }
 
 /*Prueba para funcion hash_contiene*/
@@ -52,10 +58,20 @@ void prueba_hash_contiene(){
 
     /* Declaro las variables a utilizar*/
     hash_t* hash = hash_crear(NULL, 5);
+    int a = 1, b = 2, c = 3, d = 4;
 
     /*Inicio de pruebas*/
     prueba("El hash se creo con exito", hash != NULL);
+    prueba("Se inserta un elemento al hash", hash_insertar(hash, "clave1", &a) == 0);
+    prueba("Obtengo el elemento insertado", hash_contiene(hash, "clave1"));
+    prueba("Se inserta otro elemento al hash", hash_insertar(hash, "clave2", &b) == 0);
+    prueba("Obtengo el elemento insertado", hash_contiene(hash, "clave2"));
+    prueba("Se inserta otro elemento al hash", hash_insertar(hash, "clave3", &c) == 0);
+    prueba("Obtengo el elemento insertado", hash_contiene(hash, "clave3"));
+    prueba("Se inserta otro elemento que tiene la misma clave que el anterior al hash", hash_insertar(hash, "clave3", &d) == 0);
+    prueba("Obtengo el elemento insertado", hash_contiene(hash, "clave3"));
 }
+
 
 /*Prueba para funcion hash_obtener*/
 void prueba_hash_obtener(){
@@ -63,9 +79,18 @@ void prueba_hash_obtener(){
 
     /* Declaro las variables a utilizar*/
     hash_t* hash = hash_crear(NULL, 5);
+    int a = 1, b = 2, c = 3 , d = 4;
 
     /*Inicio de pruebas*/
     prueba("El hash se creo con exito", hash != NULL);
+    prueba("Se inserta un elemento al hash", hash_insertar(hash, "clave1", &a) == 0);
+    prueba("Obtengo el elemento insertado", hash_obtener(hash, "clave1") == &a);
+    prueba("Se inserta otro elemento al hash", hash_insertar(hash, "clave2", &b) == 0);
+    prueba("Obtengo el elemento insertado", hash_obtener(hash, "clave2") == &b);
+    prueba("Se inserta otro elemento al hash", hash_insertar(hash, "clave3", &c) == 0);
+    prueba("Obtengo el elemento insertado", hash_obtener(hash, "clave3") == &c);
+    prueba("Se inserta otro elemento que tiene la misma clave que el anterior al hash", hash_insertar(hash, "clave3", &d) == 0);
+    prueba("Obtengo el elemento insertado", hash_obtener(hash, "clave3") == &d);
 }
 
 int main(){
