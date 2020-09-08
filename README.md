@@ -37,27 +37,17 @@ Ejecutamos:
 
 ### ¿Qué se esta entregando?
 
-Se entrega el desarrollo del tda y sus respectivas pruebas, evaluando todas las primitivas, puede observar --> [pruebas](hash_pruebas.c)
+Se entrega el desarrollo del tda y sus respectivas pruebas, evaluando las primitivas.
 
 ### Una explicación de los diferentes tipos de hashes que conoce y cómo se resuelven las colisiones.
 
 - HASH ABIERTO
-    - 
+    
 - HASH CERRADO
-
-COMO SE RESUELVEN COLISIONES:
-
 
  
 ### ¿Qué entiende por rehash y por qué es importante?
 
+- Rehash, valga la rebundancia seria hashear nuestra tabla del hash nuevamente ya que se requiere mas espacio por ejemplo. Basicamente porque la capacidad deja de ser igual y como nuestra funcion de hashing depende de la misma es necesario hacer este rehash.
 
-
-
-
->Que es un hash?
-
->Nos sirve para almacenar datos, estructura que nos sirve para almacenar datos y nos permite guardar el elemento en una posicion determinada.
-
->Podemos acceder a la posicion que tenemos que almacenarlo casi directamente.
-
+- Sea el caso en que no se rehashe no encontrariamos a los elementos a traves de la clave que enviemos, ya que al hashear esa clave puede que devuelva que el elemento se encuentra en una posicion que no esta o que directamente no esta.

@@ -31,6 +31,8 @@ void prueba_hash_crear(){
 
     /*Inicio de pruebas*/
     prueba("El hash se creo con exito", hash != NULL);
+
+    hash_destruir(hash);
 }
 
 /*Prueba para funcion hash_cantidad*/
@@ -55,6 +57,7 @@ void prueba_hash_cantidad(){
     prueba("Se quita un elemento al hash", hash_quitar(hash, "clave2") == 0);
     prueba("El hash tiene 0 elemento", hash_cantidad(hash) == 0);
 
+    hash_destruir(hash);
 }
 
 /*Prueba para funcion hash_contiene*/
@@ -78,6 +81,8 @@ void prueba_hash_contiene(){
     prueba("Intento obtener un elemento que no esta en el hash", !hash_contiene(hash, "clave4"));
     prueba("Se quita un elemento al hash", hash_quitar(hash, "clave2") == 0);
     prueba("Intento obtener un elemento que ya no esta mas en el hash", !hash_contiene(hash, "clave2"));
+
+    hash_destruir(hash);
 }
 
 
@@ -99,6 +104,8 @@ void prueba_hash_obtener(){
     prueba("Obtengo el elemento insertado", hash_obtener(hash, "clave3") == &c);
     prueba("Se inserta otro elemento que tiene la misma clave que el anterior al hash", hash_insertar(hash, "clave3", &d) == 0);
     prueba("Obtengo el elemento insertado", hash_obtener(hash, "clave3") == &d);
+
+    hash_destruir(hash);
 }
 
 /*Prueba para funcion hash_quitar*/
@@ -119,13 +126,15 @@ void prueba_hash_quitar(){
     prueba("Se quita un elemento al hash", hash_quitar(hash, "clave1") == 0);
     prueba("Se quita un elemento al hash", hash_quitar(hash, "clave3") == 0);
     prueba("Se quita un elemento al hash", hash_quitar(hash, "clave4") == 0);
+
+    hash_destruir(hash);
 }
 
 int main(){
     prueba_hash_crear();
     prueba_hash_cantidad();
+    prueba_hash_quitar();
     prueba_hash_contiene();
     prueba_hash_obtener();
-    prueba_hash_quitar();
     return 0;
 }

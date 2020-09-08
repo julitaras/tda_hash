@@ -199,7 +199,7 @@ nodo_hash_t* hash_obtener_nodo(hash_t* hash, const char* clave){
         return NULL;
     }
     size_t pos = hasheo(clave, hash->capacidad);
-    
+
     lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
     
     if(!iterador){
@@ -208,6 +208,12 @@ nodo_hash_t* hash_obtener_nodo(hash_t* hash, const char* clave){
 
     while(lista_iterador_tiene_siguiente(iterador)){
         nodo_hash_t* nodo = lista_iterador_siguiente(iterador);
+
+        if(!nodo){
+            lista_iterador_destruir(iterador);
+            
+            return NULL;
+        }
 
         if(strcmp(nodo->clave, clave) == 0){
             lista_iterador_destruir(iterador);
@@ -275,28 +281,16 @@ int hash_insertar(hash_t* hash, const char* clave, void* elemento){
 }
 
 bool hash_contiene(hash_t* hash, const char* clave){
-    if(!hash || !clave){
+   if(!hash || !clave){
         return false;
     }
-    size_t pos = hasheo(clave, hash->capacidad);
-
-    lista_iterador_t* iterador = lista_iterador_crear(hash->tabla[pos]);
-    if(!iterador){
-       return NULL;
+ 
+    nodo_hash_t* nodo = hash_obtener_nodo(hash, clave);
+    if(!nodo){
+        return false;
     }
 
-    while(lista_iterador_tiene_siguiente(iterador)){
-        nodo_hash_t* nodo = lista_iterador_siguiente(iterador);
-        if(strcmp(nodo->clave, clave) == 0){
-            lista_iterador_destruir(iterador);
-
-            return true;
-        }
-    }
-
-    lista_iterador_destruir(iterador);
-    
-    return false;
+    return true;
 }
 
 void* hash_obtener(hash_t* hash, const char* clave){
@@ -321,12 +315,29 @@ size_t hash_cantidad(hash_t* hash){
 }
 
 void hash_destruir(hash_t* hash){
-    if(!hash){
+	if(!hash){
         return;
     }
 
-    //ver bien como destruir en la lista 
+	for(size_t i = 0; i < hash->capacidad; i++){
 
+		while(hash->tabla[i] != NULL && !lista_vacia(hash->tabla[i])){
+			nodo_hash_t* nodo = lista_ultimo(hash->tabla[i]);
+			
+            if(hash->destructor){
+				hash->destructor(nodo->elemento);
+            }
+
+            free(nodo->clave);
+			free(nodo);
+			
+            lista_borrar(hash->tabla[i]);
+		}
+
+		lista_destruir(hash->tabla[i]);
+	}
+
+	free(hash->tabla);
 	free(hash);
 }
 
@@ -350,6 +361,12 @@ size_t hash_obtener_pos_lista(hash_t* hash, const char* clave){
 
     while(lista_iterador_tiene_siguiente(iterador)){
         nodo_hash_t* nodo = lista_iterador_siguiente(iterador);
+
+        if(!nodo){
+            lista_iterador_destruir(iterador);
+
+            return pos_lista;
+        }
         
         if(strcmp(nodo->clave, clave) == 0){
             lista_iterador_destruir(iterador);
@@ -385,6 +402,7 @@ int hash_quitar(hash_t* hash, const char* clave){
     if(hash->destructor){
         hash->destructor(nodo_eliminar->elemento);
     }
+    
     free(nodo_eliminar->clave);
     free(nodo_eliminar);
 
